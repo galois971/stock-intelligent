@@ -1,0 +1,1 @@
+"Has children: " . ($cat- ? 'Yes' : 'No') . "\n";
