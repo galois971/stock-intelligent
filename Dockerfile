@@ -1,42 +1,28 @@
-# Utiliser PHP 8.2 avec Apache
-FROM php:8.2-apache
+# Utiliser une image PHP avec Composer
+FROM php:8.2-fpm
 
 # Installer les dépendances système
 RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    unzip \
-    git \
-    curl \
-    && docker-php-ext-install pdo pdo_pgsql
-
-# Activer mod_rewrite pour Laravel
-RUN a2enmod rewrite
-
-# Copier le code source
-COPY . /var/www/html
-
-# Définir le répertoire de travail
-WORKDIR /var/www/html
+    git curl zip unzip nodejs npm \
+    && docker-php-ext-install pdo pdo_mysql pdo_pgsql
 
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+# Copier le code
+WORKDIR /var/www/html
+COPY . .
+
+# Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader
 
-# Donner les bons droits à Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Installer les dépendances Node et compiler les assets
+RUN npm install && npm run build
 
-# Configurer Apache pour pointer vers /public
-RUN echo '<VirtualHost *:80>\n\
-    DocumentRoot /var/www/html/public\n\
-    <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+# Donner les bons droits
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Exposer le port
-EXPOSE 80
+EXPOSE 9000
 
-# Lancer Apache directement (les migrations et clears seront faits via Render build command)
-CMD ["apache2-foreground"]
+CMD ["php-fpm"]
