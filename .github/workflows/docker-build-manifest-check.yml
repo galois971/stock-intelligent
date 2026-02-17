@@ -1,0 +1,43 @@
+name: Docker Build & Vite manifest check
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker image (multi-stage)
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: Dockerfile
+          platforms: linux/amd64
+          tags: stock-intelligent:ci
+          load: true
+
+      - name: Verify Vite manifest exists inside image
+        run: |
+          echo "Checking if /public/build/manifest.json exists in image..."
+          docker run --rm stock-intelligent:ci sh -c '
+            if [ -f public/build/manifest.json ]; then
+              echo "MANIFEST_EXISTS";
+              head -n 30 public/build/manifest.json;
+            else
+              echo "MANIFEST_MISSING";
+              exit 1;
+            fi
+          '
