@@ -38,6 +38,12 @@ class DashboardController extends Controller
             return $product->currentStock() <= 0;
         })->take(10);
 
+        // Produits expirés
+        $expiredProducts = Product::expired()->take(10)->get();
+
+        // Produits expirant bientôt (30 jours)
+        $expiringProducts = Product::expiringWithin(30)->take(10)->get();
+
         // Mouvements récents (30 derniers jours)
         $recentMovements = StockMovement::with(['product', 'user'])
             ->where('movement_date', '>=', Carbon::now()->subDays(30))
@@ -72,6 +78,13 @@ class DashboardController extends Controller
         $predictions = $this->getPredictions();
         $latestForecasts = Forecast::with('product')->orderBy('created_at', 'desc')->take(10)->get();
 
+        // Alertes par type
+        $alertsByType = StockAlert::select('alert_type', DB::raw('COUNT(*) as count'))
+            ->where('is_resolved', false)
+            ->groupBy('alert_type')
+            ->get()
+            ->pluck('count', 'alert_type');
+
         return view('dashboard', compact(
             'totalProducts',
             'totalCategories',
@@ -79,13 +92,16 @@ class DashboardController extends Controller
             'stockValue',
             'lowStockProducts',
             'outOfStockProducts',
+            'expiredProducts',
+            'expiringProducts',
             'recentMovements',
             'movementsByType',
             'movementsByCategory',
             'stockEvolution',
             'rotationRate',
             'predictions',
-            'latestForecasts'
+            'latestForecasts',
+            'alertsByType'
         ));
     }
 

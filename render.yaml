@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: stock-intelligent
+    runtime: php
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: |
+      php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_NAME
+        value: StockIntelligent
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_SSLMODE
+        value: require
+      - key: LOG_CHANNEL
+        value: stack
+      - key: SESSION_DRIVER
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: CACHE_STORE
+        value: database
+      # Variables sensibles à ajouter via Render (ne pas les commiter) :
+      # - APP_KEY
+      # - DB_HOST
+      # - DB_PORT
+      # - DB_DATABASE
+      # - DB_USERNAME
+      # - DB_PASSWORD
+      # - MAIL_USERNAME
+      # - MAIL_PASSWORD
+      # - APP_URL

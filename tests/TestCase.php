@@ -2,10 +2,24 @@
 
 namespace Tests;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Spatie\Permission\Models\Role;
 
 abstract class TestCase extends BaseTestCase
 {
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Create roles for testing
+        Role::create(['name' => 'admin', 'guard_name' => 'web']);
+        Role::create(['name' => 'gestionnaire', 'guard_name' => 'web']);
+        Role::create(['name' => 'observateur', 'guard_name' => 'web']);
+    }
+
     /**
      * Creates the application.
      *

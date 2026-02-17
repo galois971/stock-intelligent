@@ -1,4 +1,4 @@
-<nav x-data="{ sidebarOpen: false }" class="bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-md sticky top-0 z-40">
+<nav x-data="{ sidebarOpen: false }" class="bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-md sticky top-0 z-40" x-bind:class="{'dark-nav': $store.theme === 'dark'}">
     <!-- Top Navigation Bar -->
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
@@ -22,6 +22,11 @@
 
             <!-- User Menu -->
             <div class="flex items-center space-x-4">
+                <!-- Theme Toggle -->
+                <button x-on:click="$store.theme = ($store.theme === 'dark' ? 'light' : 'dark'); localStorage.setItem('theme', $store.theme); document.documentElement.classList.toggle('dark');" title="Toggle theme" class="p-2 rounded-md hover:bg-gray-100 transition">
+                    <svg x-show="$store.theme !== 'dark'" class="w-6 h-6 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-11.66l-.7.7M4.04 19.96l-.7.7M21 12h-1M4 12H3m16.66 4.66l-.7-.7M4.04 4.04l-.7-.7"/></svg>
+                    <svg x-show="$store.theme === 'dark'" class="w-6 h-6 text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M21.64 13a9 9 0 1 1-10.64-10.64 7 7 0 1 0 10.64 10.64z"/></svg>
+                </button>
                 <div class="relative group hidden sm:block">
                     <button class="flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition">
                         <div class="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">

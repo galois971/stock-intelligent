@@ -7,14 +7,19 @@
         <div>
             <h1 class="text-3xl font-bold text-gray-900">📦 Gestion des Produits</h1>
             <p class="mt-2 text-gray-600">Gérez vos produits, stocks et prix</p>
+            @if(auth()->user() && auth()->user()->hasRole('observateur'))
+                <p class="mt-1 text-sm text-blue-600 font-medium">📖 Mode lecture seule (Observateur)</p>
+            @endif
         </div>
-        <a href="{{ route('products.create') }}"
-           class="mt-4 sm:mt-0 inline-flex items-center px-6 py-3 bg-emerald-600 text-white shadow-md hover:shadow-lg hover:bg-emerald-700 font-medium rounded-lg transition shadow-lg">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Nouveau Produit
-        </a>
+        @if(auth()->user() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('gestionnaire')))
+            <a href="{{ route('products.create') }}"
+               class="mt-4 sm:mt-0 inline-flex items-center px-6 py-3 bg-emerald-600 text-white shadow-md hover:shadow-lg hover:bg-emerald-700 font-medium rounded-lg transition shadow-lg">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Nouveau Produit
+            </a>
+        @endif
     </div>
 
     <!-- CONTENEUR DASHBOARD -->
@@ -123,19 +128,21 @@
                                        class="p-2 text-gray-600 hover:text-emerald-600 hover:bg-blue-500/10 rounded-lg transition">
                                         👁
                                     </a>
-                                    <a href="{{ route('products.edit', $product->id) }}"
-                                       class="p-2 text-gray-600 hover:text-amber-600 hover:bg-amber-600/10 rounded-lg transition">
-                                        ✏️
-                                    </a>
-                                    <form action="{{ route('products.destroy', $product->id) }}" method="POST"
-                                          onsubmit="return confirm('Supprimer ce produit ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                                class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-500/10 rounded-lg transition">
-                                            🗑
-                                        </button>
-                                    </form>
+                                    @if(auth()->user() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('gestionnaire')))
+                                        <a href="{{ route('products.edit', $product->id) }}"
+                                           class="p-2 text-gray-600 hover:text-amber-600 hover:bg-amber-600/10 rounded-lg transition">
+                                            ✏️
+                                        </a>
+                                        <form action="{{ route('products.destroy', $product->id) }}" method="POST"
+                                              onsubmit="return confirm('Supprimer ce produit ?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit"
+                                                    class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-500/10 rounded-lg transition">
+                                                🗑
+                                            </button>
+                                        </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>

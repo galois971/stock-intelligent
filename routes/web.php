@@ -20,6 +20,11 @@ use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SwaggerController;
+
+// Swagger/API Documentation Routes
+Route::get('/api/docs', [SwaggerController::class, 'index'])->name('swagger.index')->withoutMiddleware('web');
+Route::get('/api/docs.json', [SwaggerController::class, 'json'])->name('swagger.json')->withoutMiddleware('web');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
@@ -79,40 +84,84 @@ Route::middleware('auth')->get('/dashboard', [DashboardController::class, 'index
 
 // Protected routes requiring authentication
 Route::middleware('auth')->group(function () {
-	Route::resource('products', ProductController::class);
+	// Products - read routes available to all authenticated users
+	Route::get('products', [ProductController::class, 'index'])->name('products.index');
+	Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show')->whereNumber('product');
 
-	// Product import (web UI) - uses session auth and role check
+	// Product write routes (create/update/delete) require gestionnaire or admin
 	Route::middleware('role:admin,gestionnaire')->group(function () {
+		Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+		Route::post('products', [ProductController::class, 'store'])->name('products.store');
+		Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+		Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+		Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+
+		// Product import (web UI)
 		Route::get('products/import', [\App\Http\Controllers\ProductImportController::class, 'show'])->name('products.import.show');
 		Route::post('products/import', [\App\Http\Controllers\ProductImportController::class, 'import'])->name('products.import');
 		Route::get('products/import/status/{importJob}', [\App\Http\Controllers\ProductImportController::class, 'statusPage'])->name('products.import.status');
 		Route::get('products/import/status/{importJob}/json', [\App\Http\Controllers\ProductImportController::class, 'statusJson'])->name('products.import.status.json');
 	});
 
-	// Movement import (web UI)
+	// Product exports (available to authenticated users)
+	Route::get('products/export/excel', [ProductController::class, 'exportExcel'])->name('products.export.excel');
+	Route::get('products/export/pdf', [ProductController::class, 'exportPdf'])->name('products.export.pdf');
+	Route::get('products/{product}/export/pdf', [ProductController::class, 'exportProductPdf'])->name('products.export.product_pdf');
+
+	// Categories - read routes
+	Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+	Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show')->whereNumber('category');
+	// Category write routes
 	Route::middleware('role:admin,gestionnaire')->group(function () {
+		Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+		Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+		Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+		Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+		Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+	});
+
+	// Movements - read routes
+	Route::get('movements', [StockMovementController::class, 'index'])->name('movements.index');
+	Route::get('movements/{movement}', [StockMovementController::class, 'show'])->name('movements.show')->whereNumber('movement');
+	// Movement write routes
+	Route::middleware('role:admin,gestionnaire')->group(function () {
+		Route::get('movements/create', [StockMovementController::class, 'create'])->name('movements.create');
+		Route::post('movements', [StockMovementController::class, 'store'])->name('movements.store');
+		Route::get('movements/{movement}/edit', [StockMovementController::class, 'edit'])->name('movements.edit');
+		Route::put('movements/{movement}', [StockMovementController::class, 'update'])->name('movements.update');
+		Route::delete('movements/{movement}', [StockMovementController::class, 'destroy'])->name('movements.destroy');
+
+		// Movement import (web UI)
 		Route::get('movements/import', [\App\Http\Controllers\StockMovementImportController::class, 'show'])->name('movements.import.show');
 		Route::post('movements/import', [\App\Http\Controllers\StockMovementImportController::class, 'import'])->name('movements.import');
 		Route::get('movements/import/status/{importJob}', [\App\Http\Controllers\StockMovementImportController::class, 'statusPage'])->name('movements.import.status');
 		Route::get('movements/import/status/{importJob}/json', [\App\Http\Controllers\StockMovementImportController::class, 'statusJson'])->name('movements.import.status.json');
 	});
-	// Exports for products
-	Route::get('products/export/excel', [ProductController::class, 'exportExcel'])->name('products.export.excel');
-	Route::get('products/export/pdf', [ProductController::class, 'exportPdf'])->name('products.export.pdf');
-	Route::get('products/{product}/export/pdf', [ProductController::class, 'exportProductPdf'])->name('products.export.product_pdf');
 
-	Route::resource('categories', CategoryController::class);
-	Route::resource('movements', StockMovementController::class);
-	// Exports for movements
+	// Movement exports
 	Route::get('movements/export/excel', [StockMovementController::class, 'exportExcel'])->name('movements.export.excel');
 	Route::get('movements/export/pdf', [StockMovementController::class, 'exportPdf'])->name('movements.export.pdf');
 
-	Route::resource('inventories', InventoryController::class);
-	// Exports for inventories
+	// Inventories - read routes
+	Route::get('inventories', [InventoryController::class, 'index'])->name('inventories.index');
+	Route::get('inventories/{inventory}', [InventoryController::class, 'show'])->name('inventories.show')->whereNumber('inventory');
+	// Inventory write routes
+	Route::middleware('role:admin,gestionnaire')->group(function () {
+		Route::get('inventories/create', [InventoryController::class, 'create'])->name('inventories.create');
+		Route::post('inventories', [InventoryController::class, 'store'])->name('inventories.store');
+		Route::get('inventories/{inventory}/edit', [InventoryController::class, 'edit'])->name('inventories.edit');
+		Route::put('inventories/{inventory}', [InventoryController::class, 'update'])->name('inventories.update');
+		Route::delete('inventories/{inventory}', [InventoryController::class, 'destroy'])->name('inventories.destroy');
+	});
+
+	// Inventories exports
 	Route::get('inventories/export/excel', [InventoryController::class, 'exportExcel'])->name('inventories.export.excel');
 	Route::get('inventories/export/pdf', [InventoryController::class, 'exportPdf'])->name('inventories.export.pdf');
 
-	Route::resource('alerts', StockAlertController::class)->only(['index', 'show', 'destroy']);
+	// Alerts - viewing for all authenticated, deletion for admin/gestionnaire
+	Route::get('alerts', [StockAlertController::class, 'index'])->name('alerts.index');
+	Route::get('alerts/{alert}', [StockAlertController::class, 'show'])->name('alerts.show')->whereNumber('alert');
+	Route::middleware('role:admin,gestionnaire')->delete('alerts/{alert}', [StockAlertController::class, 'destroy'])->name('alerts.destroy');
 
 	// JSON endpoint used by dashboard to fetch live counters
 	Route::get('dashboard/counts', function () {

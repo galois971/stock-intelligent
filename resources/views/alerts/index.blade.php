@@ -62,16 +62,18 @@
                                 </svg>
                                 Détails
                             </a>
-                            <form action="{{ route('alerts.destroy', $alert) }}" method="POST" class="flex-1" onsubmit="return confirm('Marquer cette alerte comme résolue ?')">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="w-full px-4 py-2 bg-teal-100 text-green-700 font-medium rounded-xl hover:bg-green-900/50 transition border border-green-700">
-                                    <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                    </svg>
-                                    Résoudre
-                                </button>
-                            </form>
+                            @if(auth()->user() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('gestionnaire')))
+                                <form action="{{ route('alerts.destroy', $alert) }}" method="POST" class="flex-1" onsubmit="return confirm('Marquer cette alerte comme résolue ?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="w-full px-4 py-2 bg-teal-100 text-green-700 font-medium rounded-xl hover:bg-green-900/50 transition border border-green-700">
+                                        <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                        </svg>
+                                        Résoudre
+                                    </button>
+                                </form>
+                            @endif
                         </div>
                     </div>
                 </div>

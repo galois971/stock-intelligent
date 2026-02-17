@@ -66,6 +66,12 @@
     </div>
 
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('theme', localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+            if (Alpine.store('theme') === 'dark') document.documentElement.classList.add('dark');
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

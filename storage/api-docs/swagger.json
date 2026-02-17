@@ -1,0 +1,797 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Stock Intelligence API",
+    "description": "API de gestion de stock avec prédictions et alertes",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Support",
+      "email": "support@stock-intelligent.local"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost",
+      "description": "Développement",
+      "variables": {
+        "basePath": {
+          "default": "/api/v1"
+        }
+      }
+    },
+    {
+      "url": "https://api.stock-intelligent.com",
+      "description": "Production",
+      "variables": {
+        "basePath": {
+          "default": "/api/v1"
+        }
+      }
+    }
+  ],
+  "paths": {
+    "/products": {
+      "get": {
+        "tags": ["Produits"],
+        "summary": "Lister tous les produits",
+        "description": "Récupère la liste complète des produits avec pagination",
+        "operationId": "getProducts",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Numéro de page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Éléments par page",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 15
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des produits",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Product"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/PaginationMeta"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Non authentifié"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Produits"],
+        "summary": "Créer un nouveau produit",
+        "description": "Crée un nouveau produit (admin ou gestionnaire uniquement)",
+        "operationId": "createProduct",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProductRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Produit créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation échouée"
+          },
+          "403": {
+            "description": "Accès refusé"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/products/{id}": {
+      "get": {
+        "tags": ["Produits"],
+        "summary": "Obtenir un produit",
+        "description": "Récupère les détails d'un produit spécifique",
+        "operationId": "getProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID du produit",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails du produit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produit non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": ["Produits"],
+        "summary": "Mettre à jour un produit",
+        "description": "Met à jour un produit existant (admin ou gestionnaire)",
+        "operationId": "updateProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID du produit",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProductRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Produit mis à jour"
+          },
+          "404": {
+            "description": "Produit non trouvé"
+          },
+          "403": {
+            "description": "Accès refusé"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["Produits"],
+        "summary": "Supprimer un produit",
+        "description": "Supprime un produit (admin uniquement)",
+        "operationId": "deleteProduct",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID du produit",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Produit supprimé"
+          },
+          "404": {
+            "description": "Produit non trouvé"
+          },
+          "403": {
+            "description": "Accès refusé"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/stock-movements": {
+      "get": {
+        "tags": ["Mouvements de Stock"],
+        "summary": "Lister les mouvements de stock",
+        "description": "Récupère la liste des mouvements de stock avec filtrage",
+        "operationId": "getStockMovements",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "description": "Filtrer par ID produit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Type de mouvement (entry/exit)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["entry", "exit"]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des mouvements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StockMovement"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["Mouvements de Stock"],
+        "summary": "Créer un mouvement de stock",
+        "description": "Enregistre un nouveau mouvement d'entrée ou sortie",
+        "operationId": "createStockMovement",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateStockMovementRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Mouvement créé"
+          },
+          "422": {
+            "description": "Validation échouée"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/forecasts": {
+      "get": {
+        "tags": ["Prédictions"],
+        "summary": "Obtenir les prédictions",
+        "description": "Récupère les prédictions de demande des 30 prochains jours",
+        "operationId": "getForecasts",
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "query",
+            "description": "ID du produit",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "description": "Nombre de jours à prédire",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Prédictions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Forecast"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/stock-alerts": {
+      "get": {
+        "tags": ["Alertes"],
+        "summary": "Lister les alertes de stock",
+        "description": "Récupère les alertes actives et résolues",
+        "operationId": "getStockAlerts",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Statut de l'alerte",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["active", "resolved"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des alertes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StockAlert"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/dashboard": {
+      "get": {
+        "tags": ["Tableau de Bord"],
+        "summary": "Obtenir les indicateurs du tableau de bord",
+        "description": "Récupère les KPIs principaux : total articles, valeur stock, alertes, etc.",
+        "operationId": "getDashboard",
+        "responses": {
+          "200": {
+            "description": "Indicateurs du tableau de bord",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Dashboard"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Laptop Dell"
+          },
+          "barcode": {
+            "type": "string",
+            "example": "8712345678901"
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "example": 1299.99
+          },
+          "stock_min": {
+            "type": "integer",
+            "example": 10
+          },
+          "stock_optimal": {
+            "type": "integer",
+            "example": 50
+          },
+          "category_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "category": {
+            "$ref": "#/components/schemas/Category"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": ["id", "name", "barcode", "price", "stock_min", "stock_optimal"]
+      },
+      "CreateProductRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Laptop Dell"
+          },
+          "barcode": {
+            "type": "string",
+            "example": "8712345678901"
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "example": 1299.99
+          },
+          "stock_min": {
+            "type": "integer",
+            "example": 10
+          },
+          "stock_optimal": {
+            "type": "integer",
+            "example": 50
+          },
+          "category_id": {
+            "type": "integer",
+            "nullable": true
+          }
+        },
+        "required": ["name", "barcode", "price", "stock_min", "stock_optimal"]
+      },
+      "UpdateProductRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "barcode": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number",
+            "format": "float"
+          },
+          "stock_min": {
+            "type": "integer"
+          },
+          "stock_optimal": {
+            "type": "integer"
+          },
+          "category_id": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "StockMovement": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "product_id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["entry", "exit"]
+          },
+          "subtype": {
+            "type": "string",
+            "example": "achat"
+          },
+          "quantity": {
+            "type": "integer",
+            "example": 50
+          },
+          "motif": {
+            "type": "string",
+            "nullable": true
+          },
+          "movement_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "user_id": {
+            "type": "integer"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateStockMovementRequest": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "integer"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["entry", "exit"]
+          },
+          "subtype": {
+            "type": "string",
+            "example": "achat"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "motif": {
+            "type": "string",
+            "nullable": true
+          },
+          "movement_date": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": ["product_id", "type", "subtype", "quantity", "movement_date"]
+      },
+      "StockAlert": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "product_id": {
+            "type": "integer"
+          },
+          "alert_type": {
+            "type": "string",
+            "enum": ["low_stock", "overstock", "risk_of_rupture", "expiration"]
+          },
+          "current_quantity": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "is_resolved": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Forecast": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "product_id": {
+            "type": "integer"
+          },
+          "forecasted_demand": {
+            "type": "number",
+            "format": "float"
+          },
+          "forecast_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "method": {
+            "type": "string",
+            "example": "moving_average"
+          },
+          "rmse": {
+            "type": "number",
+            "format": "float"
+          },
+          "mape": {
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "Dashboard": {
+        "type": "object",
+        "properties": {
+          "total_products": {
+            "type": "integer",
+            "example": 150
+          },
+          "total_stock_value": {
+            "type": "number",
+            "format": "float",
+            "example": 50000.50
+          },
+          "active_alerts": {
+            "type": "integer",
+            "example": 5
+          },
+          "low_stock_products": {
+            "type": "integer",
+            "example": 3
+          },
+          "overstock_products": {
+            "type": "integer",
+            "example": 2
+          },
+          "alerts_by_type": {
+            "type": "object",
+            "properties": {
+              "low_stock": {
+                "type": "integer"
+              },
+              "overstock": {
+                "type": "integer"
+              },
+              "risk_of_rupture": {
+                "type": "integer"
+              },
+              "expiration": {
+                "type": "integer"
+              }
+            }
+          }
+        }
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "count": {
+            "type": "integer"
+          },
+          "per_page": {
+            "type": "integer"
+          },
+          "current_page": {
+            "type": "integer"
+          },
+          "total_pages": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Bearer token JWT pour authentification"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Produits",
+      "description": "Gestion des produits"
+    },
+    {
+      "name": "Mouvements de Stock",
+      "description": "Entrées/sorties de stock"
+    },
+    {
+      "name": "Prédictions",
+      "description": "Prédictions de demande"
+    },
+    {
+      "name": "Alertes",
+      "description": "Alertes de stock"
+    },
+    {
+      "name": "Tableau de Bord",
+      "description": "KPIs et métriques"
+    }
+  ]
+}

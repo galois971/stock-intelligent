@@ -35,8 +35,8 @@ RUN echo '<VirtualHost *:80>\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
 
-# Exécuter les migrations automatiquement en production
-RUN php artisan migrate --force
-
+# Exposer le port
 EXPOSE 80
-CMD ["apache2-foreground"]
+
+# Lancer les migrations au démarrage, puis Apache
+CMD php artisan migrate --force && php artisan serve --host 0.0.0.0 --port $PORT

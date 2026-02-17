@@ -12,9 +12,13 @@ class RoleMiddleware
      */
     public function handle($request, Closure $next, $roles)
     {
-        $user = $request->user ?? null;
+        $user = $request->user() ?? null;
         if (! $user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+            // For web requests redirect to login, for API return JSON
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+            return redirect()->route('login');
         }
 
         $allowed = array_map('trim', explode(',', $roles));
@@ -25,6 +29,10 @@ class RoleMiddleware
             }
         }
 
-        return response()->json(['message' => 'Forbidden (role)'], 403);
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Forbidden (role)'], 403);
+        }
+
+        abort(403, 'Forbidden (role)');
     }
 }

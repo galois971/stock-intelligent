@@ -7,13 +7,18 @@
         <div>
             <h1 class="text-3xl font-bold text-gray-900">🏷️ Gestion des Catégories</h1>
             <p class="mt-2 text-gray-600">Organisez vos produits par catégories</p>
+            @if(auth()->user() && auth()->user()->hasRole('observateur'))
+                <p class="mt-1 text-sm text-blue-600 font-medium">📖 Mode lecture seule (Observateur)</p>
+            @endif
         </div>
-        <a href="{{ route('categories.create') }}" class="mt-4 sm:mt-0 inline-flex items-center px-6 py-3 bg-emerald-600 text-white shadow-md hover:shadow-lg hover:bg-emerald-700 font-medium rounded-lg transition shadow-lg">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nouvelle Catégorie
-        </a>
+        @if(auth()->user() && (auth()->user()->hasRole('admin') || auth()->user()->hasRole('gestionnaire')))
+            <a href="{{ route('categories.create') }}" class="mt-4 sm:mt-0 inline-flex items-center px-6 py-3 bg-emerald-600 text-white shadow-md hover:shadow-lg hover:bg-emerald-700 font-medium rounded-lg transition shadow-lg">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Nouvelle Catégorie
+            </a>
+        @endif
     </div>
 
     @if(session('success'))
