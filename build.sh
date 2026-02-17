@@ -4,8 +4,9 @@ set -e
 echo "🔧 Composer install..."
 composer install --no-dev --optimize-autoloader
 
-echo "� NPM install..."
-npm ci --omit=dev || npm install --omit=dev
+echo "🔧 NPM install (inclut les dépendances de dev)..."
+# Installer les dépendances de développement aussi (Vite, Tailwind, etc.)
+npm ci || npm install
 
 echo "🎯 Vite build (CSS + JS)..."
 npm run build

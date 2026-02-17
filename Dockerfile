@@ -5,8 +5,9 @@ WORKDIR /app
 # Copy only package files first to leverage layer cache
 COPY package*.json ./
 
-# Install Node dependencies (production build). Use npm install as fallback if lockfile missing
-RUN npm ci --omit=dev || npm install --omit=dev
+# Install Node dependencies (include dev dependencies required for Vite build)
+# Use `npm ci` when a lockfile is present, fallback to `npm install` otherwise
+RUN npm ci || npm install
 
 # Copy vite config and resources then build
 COPY vite.config.js .
