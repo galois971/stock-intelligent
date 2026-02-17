@@ -3,15 +3,14 @@ FROM node:18-alpine AS node_builder
 WORKDIR /app
 
 # Copy only package files first to leverage layer cache
-COPY package.json package-lock.json* ./
+COPY package*.json ./
 
-# Install Node dependencies (production build)
-RUN npm ci --omit=dev
+# Install Node dependencies (production build). Use npm install as fallback if lockfile missing
+RUN npm ci --omit=dev || npm install --omit=dev
 
-# Copy resources and vite config then build
+# Copy vite config and resources then build
 COPY vite.config.js .
 COPY resources ./resources
-COPY postcss.config.js package.json tailwind.config.js ./ 2>/dev/null || true
 
 RUN npm run build
 
