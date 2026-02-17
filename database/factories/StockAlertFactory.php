@@ -20,14 +20,17 @@ class StockAlertFactory extends Factory
      */
     public function definition(): array
     {
-        $alertType = $this->faker->randomElement(['low_stock', 'overstock']);
-        
         return [
-            'product_id' => Product::factory(),
-            'alert_type' => $alertType,
-            'current_quantity' => $this->faker->numberBetween(1, 500),
-            'message' => $this->faker->sentence(),
-            'is_resolved' => false,
+            'product_id' => Product::factory(), // génère un produit lié
+            'alert_type' => $this->faker->randomElement([
+                'low_stock',
+                'overstock',
+                'risk_of_rupture',
+                'expiration'
+            ]), // valeurs possibles
+            'current_quantity' => $this->faker->numberBetween(1, 500), // quantité aléatoire
+            'message' => $this->faker->sentence(), // message d’alerte
+            'resolved' => false, // statut par défaut
         ];
     }
 }

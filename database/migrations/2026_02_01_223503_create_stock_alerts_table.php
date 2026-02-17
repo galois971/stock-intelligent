@@ -14,13 +14,16 @@ return new class extends Migration
         Schema::create('stock_alerts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id'); // lien vers produit
-            $table->enum('alert_type', ['low_stock', 'overstock', 'risk_of_rupture', 'expiration']); // type d’alerte
+            $table->string('alert_type'); // type d’alerte (low_stock, overstock, risk_of_rupture, expiration)
             $table->integer('current_quantity'); // quantité actuelle
             $table->string('message'); // message d’alerte
             $table->boolean('resolved')->default(false); // statut de l’alerte
             $table->timestamps();
 
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('product_id')
+                  ->references('id')
+                  ->on('products')
+                  ->onDelete('cascade');
         });
     }
 
