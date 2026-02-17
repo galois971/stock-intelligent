@@ -15,7 +15,6 @@ return new class extends Migration
             // Ajouter la colonne expiration_date - nullable car tous les produits n'ont pas d'expiration
             $table->date('expiration_date')
                   ->nullable()
-                  ->after('stock_optimal')
                   ->comment('Date d\'expiration du produit');
 
             // Ajouter un index pour les requêtes fréquentes sur expiration
