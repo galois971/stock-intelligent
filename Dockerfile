@@ -26,6 +26,12 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Nettoyer les caches Laravel
+RUN php artisan config:clear && \
+    php artisan route:clear && \
+    php artisan view:clear && \
+    php artisan cache:clear
+
 # Configurer Apache pour pointer vers /public
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
@@ -39,4 +45,4 @@ RUN echo '<VirtualHost *:80>\n\
 EXPOSE 80
 
 # Lancer les migrations au démarrage, puis Apache
-CMD php artisan migrate --force && php artisan serve --host 0.0.0.0 --port $PORT
+CMD php artisan migrate --force && apache2-foreground
