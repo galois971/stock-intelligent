@@ -31,6 +31,12 @@ php artisan view:cache
 
 **Après**:
 ```bash
+# Install Node dependencies for Vite
+npm ci --omit=dev
+
+# Compile CSS and JavaScript with Vite
+npm run build
+
 # Clear all stale caches first
 php artisan cache:clear
 php artisan config:clear
@@ -43,8 +49,11 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-**Raison**: Les caches stales causaient des conflits de classes
-**Résultat**: Build propre et fiable ✅
+**Raison**: 
+- Vite doit compiler les assets (CSS/JS) avant de servir la page
+- Les caches stales causaient des conflits de classes
+- Sans `npm run build`, le manifest.json n'existe pas → erreur 500
+**Résultat**: Build propre avec assets compilés ✅
 
 ### 3. **Corrigé render.yaml**
 **Avant**:

@@ -4,6 +4,12 @@ set -e
 echo "🔧 Composer install..."
 composer install --no-dev --optimize-autoloader
 
+echo "� NPM install..."
+npm ci --omit=dev || npm install --omit=dev
+
+echo "🎯 Vite build (CSS + JS)..."
+npm run build
+
 echo "🔑 Generate APP_KEY if missing..."
 php artisan key:generate || true
 
@@ -23,5 +29,3 @@ echo "✨ Cache views..."
 php artisan view:cache
 
 echo "✅ Build complete!"
-
-echo "✅ Build complété!"

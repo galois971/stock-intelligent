@@ -56,11 +56,13 @@ The `render.yaml` file handles:
 
 ### During Build (build.sh)
 1. ✅ Composer install
-2. ✅ APP_KEY generation
-3. ✅ Cache clearing
-4. ✅ Config caching
-5. ✅ Route caching  
-6. ✅ View caching
+2. ✅ NPM install (for Vite)
+3. ✅ **Vite build** (CSS + JavaScript compilation) - **CRITICAL**
+4. ✅ APP_KEY generation
+5. ✅ Cache clearing
+6. ✅ Config caching
+7. ✅ Route caching  
+8. ✅ View caching
 
 ### During Start
 1. ✅ Database migrations
@@ -110,6 +112,13 @@ php artisan tinker
 **Fix**: Ensure render.yaml has both:
 - `php artisan migrate --force`
 - `php artisan db:seed --force`
+
+### Issue: "Vite Manifest Not Found" Error
+**Cause**: Assets not compiled (npm run build didn't execute)
+**Fix**: Ensure build.sh has:
+- `npm ci --omit=dev` (install dependencies)
+- `npm run build` (compile CSS/JS)
+- Check that output: `/public/build/manifest.json` exists
 
 ### Issue: "Class not found" errors
 **Cause**: Cache files are stale

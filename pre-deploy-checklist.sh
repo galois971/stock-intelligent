@@ -18,7 +18,16 @@ else
 fi
 
 echo ""
-echo "[2] Checking build.sh has cache:clear..."
+echo "[2] Checking build.sh has npm run build..."
+if grep -q "npm run build" build.sh; then
+    echo "✅ build.sh has npm run build"
+else
+    echo "❌ build.sh missing npm run build (Vite assets won't compile)!"
+    ERRORS=$((ERRORS + 1))
+fi
+
+echo ""
+echo "[3] Checking build.sh has cache:clear..."
 if grep -q "cache:clear" build.sh; then
     echo "✅ build.sh has cache:clear"
 else
@@ -27,7 +36,7 @@ else
 fi
 
 echo ""
-echo "[3] Checking render.yaml has db:seed..."
+echo "[4] Checking render.yaml has db:seed..."
 if grep -q "db:seed" render.yaml; then
     echo "✅ render.yaml has db:seed"
 else
@@ -36,7 +45,7 @@ else
 fi
 
 echo ""
-echo "[4] Checking DatabaseSeeder exists..."
+echo "[5] Checking DatabaseSeeder exists..."
 if [ -f "database/seeders/DatabaseSeeder.php" ]; then
     echo "✅ DatabaseSeeder.php found"
     if grep -q "assignRole" database/seeders/DatabaseSeeder.php; then
@@ -50,7 +59,7 @@ else
 fi
 
 echo ""
-echo "[5] Checking .env has production DB config..."
+echo "[6] Checking .env has production DB config..."
 if grep -q "DB_CONNECTION=pgsql" .env; then
     echo "✅ .env has PostgreSQL config"
 else
@@ -59,7 +68,7 @@ else
 fi
 
 echo ""
-echo "[6] Checking APP_KEY is set..."
+echo "[7] Checking APP_KEY is set..."
 if grep -q "APP_KEY=base64:" .env; then
     echo "✅ APP_KEY is set"
 else
@@ -68,7 +77,7 @@ else
 fi
 
 echo ""
-echo "[7] Checking composer.json has spatie/laravel-permission..."
+echo "[8] Checking composer.json has spatie/laravel-permission..."
 if grep -q "spatie/laravel-permission" composer.json; then
     echo "✅ spatie/laravel-permission in composer.json"
 else
@@ -77,7 +86,23 @@ else
 fi
 
 echo ""
-echo "[8] Checking migrations exist..."
+echo "[9] Checking package.json has build script..."
+if grep -q '"build": "vite build"' package.json; then
+    echo "✅ package.json has vite build script"
+else
+    echo "⚠️  package.json build script might be wrong"
+fi
+
+echo ""
+echo "[10] Checking vite.config.js exists..."
+if [ -f "vite.config.js" ]; then
+    echo "✅ vite.config.js found"
+else
+    echo "⚠️  vite.config.js not found"
+fi
+
+echo ""
+echo "[11] Checking migrations exist..."
 MIGRATION_COUNT=$(ls database/migrations/ | wc -l)
 if [ "$MIGRATION_COUNT" -ge 10 ]; then
     echo "✅ Found $MIGRATION_COUNT migrations (min 10)"
@@ -86,7 +111,7 @@ else
 fi
 
 echo ""
-echo "[9] Checking config/permission.php exists..."
+echo "[12] Checking config/permission.php exists..."
 if [ -f "config/permission.php" ]; then
     echo "✅ config/permission.php found"
 else
@@ -100,7 +125,7 @@ if [ $ERRORS -eq 0 ]; then
     echo ""
     echo "Next steps:"
     echo "1. git add ."
-    echo "2. git commit -m 'Fix: Deployment configuration and LoginRequest'"
+    echo "2. git commit -m 'Fix: Add Vite asset compilation to build.sh'"
     echo "3. git push origin main"
     echo ""
     exit 0
