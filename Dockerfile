@@ -43,6 +43,9 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-EXPOSE 9000
+# Expose the default port Render will provide (fallback to 10000)
+EXPOSE 10000
 
-CMD ["php-fpm"]
+# Start the built-in PHP server so an HTTP port is opened for Render.
+# Use the PORT env var provided by Render or default to 10000.
+CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-10000}"]
