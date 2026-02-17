@@ -15,35 +15,41 @@ class PurchaseOrderController extends Controller
         $this->middleware('auth');
     }
 
-class PurchaseOrderController extends Controller
-{
     /**
      * Store a newly created purchase order (AJAX)
      */
     public function store(Request $request)
     {
         $data = $request->validate([
-            'product_id' => 'required|integer|exists:products,id',
-            'forecast_id' => 'nullable|integer|exists:forecasts,id',
-            'quantity' => 'required|integer|min:1',
-            'notes' => 'nullable|string',
+            'product_id'   => 'required|integer|exists:products,id',
+            'forecast_id'  => 'nullable|integer|exists:forecasts,id',
+            'quantity'     => 'required|integer|min:1',
+            'notes'        => 'nullable|string',
         ]);
 
         $data['user_id'] = Auth::id();
 
         $po = PurchaseOrder::create($data);
 
-        // Try to send to supplier immediately (synchronous). Store response in notes and update status if successful.
-        $svc = app(SupplierIntegrationService::class);
+        // Envoi au fournisseur
+        $svc    = app(SupplierIntegrationService::class);
         $result = $svc->sendOrder($po);
-        $note = "Supplier send: status=" . ($result['status'] ?? 0) . " success=" . ($result['success'] ? '1' : '0') . " body=" . substr((string)($result['body'] ?? ''), 0, 1000);
+
+        $note = "Supplier send: status=" . ($result['status'] ?? 0)
+              . " success=" . ($result['success'] ? '1' : '0')
+              . " body=" . substr((string)($result['body'] ?? ''), 0, 1000);
+
         $po->notes = trim(($po->notes ? $po->notes . "\n" : '') . $note);
         if ($result['success']) {
             $po->status = 'sent';
         }
         $po->save();
 
-        return response()->json(['success' => true, 'purchase_order' => $po, 'supplier' => $result], 201);
+        return response()->json([
+            'success'        => true,
+            'purchase_order' => $po,
+            'supplier'       => $result
+        ], 201);
     }
 
     /**
@@ -51,8 +57,10 @@ class PurchaseOrderController extends Controller
      */
     public function index(Request $request)
     {
-        $q = PurchaseOrder::with(['product', 'forecast', 'user'])->orderBy('created_at', 'desc');
-        $orders = $q->paginate(25);
+        $orders = PurchaseOrder::with(['product', 'forecast', 'user'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(25);
+
         return view('purchase_orders.index', compact('orders'));
     }
 
@@ -70,14 +78,22 @@ class PurchaseOrderController extends Controller
      */
     public function updateStatus(Request $request, PurchaseOrder $purchaseOrder)
     {
-        $this->validate($request, ['status' => 'required|string|in:pending,approved,completed,cancelled']);
+        $this->validate($request, [
+            'status' => 'required|string|in:pending,approved,completed,cancelled'
+        ]);
+
         $purchaseOrder->status = $request->input('status');
         $purchaseOrder->save();
-        // If approved, send to supplier
+
+        // Si approuvé, envoyer au fournisseur
         if ($purchaseOrder->status === 'approved') {
-            $svc = app(SupplierIntegrationService::class);
+            $svc    = app(SupplierIntegrationService::class);
             $result = $svc->sendOrder($purchaseOrder);
-            $note = "Supplier send on approval: status=" . ($result['status'] ?? 0) . " success=" . ($result['success'] ? '1' : '0') . " body=" . substr((string)($result['body'] ?? ''), 0, 1000);
+
+            $note = "Supplier send on approval: status=" . ($result['status'] ?? 0)
+                  . " success=" . ($result['success'] ? '1' : '0')
+                  . " body=" . substr((string)($result['body'] ?? ''), 0, 1000);
+
             $purchaseOrder->notes = trim(($purchaseOrder->notes ? $purchaseOrder->notes . "\n" : '') . $note);
             if ($result['success']) {
                 $purchaseOrder->status = 'sent';
@@ -85,6 +101,9 @@ class PurchaseOrderController extends Controller
             $purchaseOrder->save();
         }
 
-        return response()->json(['success' => true, 'status' => $purchaseOrder->status]);
+        return response()->json([
+            'success' => true,
+            'status'  => $purchaseOrder->status
+        ]);
     }
 }

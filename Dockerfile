@@ -38,10 +38,5 @@ RUN echo '<VirtualHost *:80>\n\
 # Exposer le port
 EXPOSE 80
 
-# Lancer les migrations et nettoyer les caches au démarrage, puis Apache
-CMD php artisan migrate --force && \
-    php artisan config:clear && \
-    php artisan route:clear && \
-    php artisan view:clear && \
-    php artisan cache:clear && \
-    apache2-foreground
+# Lancer Apache directement (les migrations et clears seront faits via Render build command)
+CMD ["apache2-foreground"]

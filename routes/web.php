@@ -239,4 +239,6 @@ Route::prefix('api/v1')->group(function () {
 		});
 	});
 });
-
+Route::get('/debug', function () {
+    return 'Auth fonctionne';
+});
