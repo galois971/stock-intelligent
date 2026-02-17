@@ -33,6 +33,8 @@ RUN echo '<VirtualHost *:80>\n\
         Require all granted\n\
     </Directory>\n\
 </VirtualHost>' > /etc/apache2/sites-available/000-default.conf
+# Exécuter les migrations automatiquement
+RUN php artisan migrate --force
 
 EXPOSE 80
 CMD ["apache2-foreground"]
