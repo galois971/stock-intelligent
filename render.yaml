@@ -39,9 +39,9 @@ services:
       - key: APP_NAME
         value: StockIntelligent
       - key: DB_CONNECTION
-        value: pgsql
-      - key: DB_SSLMODE
-        value: require
+        value: mysql
+      - key: MYSQL_ATTR_SSL_CA
+        value: /etc/ssl/certs/ca-certificates.crt
       - key: LOG_CHANNEL
         value: stack
       - key: SESSION_DRIVER
