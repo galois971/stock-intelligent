@@ -45,11 +45,11 @@ services:
       - key: LOG_CHANNEL
         value: stack
       - key: SESSION_DRIVER
-        value: database
+        value: file
       - key: QUEUE_CONNECTION
-        value: database
+        value: sync
       - key: CACHE_STORE
-        value: database
+        value: file
       - key: APP_URL
         value: https://stock-intelligent.onrender.com
       # Variables sensibles à ajouter via Render (ne pas les commiter) :
