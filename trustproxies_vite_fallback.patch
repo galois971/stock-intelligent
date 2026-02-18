@@ -1,0 +1,76 @@
+*** Begin Patch
+*** Add File: app/Http/Middleware/TrustProxies.php
++<?php
++namespace App\Http\Middleware;
++
++use Fideloper\Proxy\TrustProxies as Middleware;
++use Illuminate\Http\Request;
++
++class TrustProxies extends Middleware
++{
++    // Trust all proxies (Render/Cloudflare)
++    protected $proxies = '*';
++
++    // Use forwarded headers (X-Forwarded-For, X-Forwarded-Proto, etc.)
++    protected $headers = Request::HEADER_X_FORWARDED_ALL;
++}
++
+*** End Patch
+*** Begin Patch
+*** Update File: resources/views/layouts/app.blade.php
+@@
+-    <title>{{ config('app.name', 'Stock Manager') }}</title>
+-    @vite(['resources/css/app.css', 'resources/js/app.js'])
++    <title>{{ config('app.name', 'Stock Manager') }}</title>
++    @php
++        $manifestPath = public_path('build/manifest.json');
++    @endphp
++
++    @if (file_exists($manifestPath))
++        @vite(['resources/css/app.css', 'resources/js/app.js'])
++    @else
++        @php
++            $manifest = json_decode(@file_get_contents($manifestPath), true) ?: null;
++        @endphp
++        @if (is_array($manifest) && isset($manifest['resources/css/app.css']['file']))
++            <link rel="stylesheet" href="{{ asset('build/' . $manifest['resources/css/app.css']['file']) }}">
++        @else
++            {{-- Fallback statique si manifest manquant ou corrompu --}}
++            <link rel="stylesheet" href="{{ asset('build/assets/app-DPg4-Vjw.css') }}">
++        @endif
++        @if (is_array($manifest) && isset($manifest['resources/js/app.js']['file']))
++            <script src="{{ asset('build/' . $manifest['resources/js/app.js']['file']) }}" defer></script>
++        @else
++            <script src="{{ asset('build/assets/app-CKl8NZMC.js') }}" defer></script>
++        @endif
++    @endif
+*** End Patch
+*** Begin Patch
+*** Update File: resources/views/layouts/guest.blade.php
+@@
+-        <!-- Scripts -->
+-        @vite(['resources/css/app.css', 'resources/js/app.js'])
++        <!-- Scripts -->
++        @php
++            $manifestPath = public_path('build/manifest.json');
++        @endphp
++
++        @if (file_exists($manifestPath))
++            @vite(['resources/css/app.css', 'resources/js/app.js'])
++        @else
++            @php
++                $manifest = json_decode(@file_get_contents($manifestPath), true) ?: null;
++            @endphp
++            @if (is_array($manifest) && isset($manifest['resources/css/app.css']['file']))
++                <link rel="stylesheet" href="{{ asset('build/' . $manifest['resources/css/app.css']['file']) }}">
++            @else
++                {{-- Fallback statique si manifest manquant ou corrompu --}}
++                <link rel="stylesheet" href="{{ asset('build/assets/app-DPg4-Vjw.css') }}">
++            @endif
++            @if (is_array($manifest) && isset($manifest['resources/js/app.js']['file']))
++                <script src="{{ asset('build/' . $manifest['resources/js/app.js']['file']) }}" defer></script>
++            @else
++                <script src="{{ asset('build/assets/app-CKl8NZMC.js') }}" defer></script>
++            @endif
++        @endif
+*** End Patch

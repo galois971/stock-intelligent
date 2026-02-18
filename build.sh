@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+echo "🔧 Vérification Node/NPM..."
+node -v
+npm -v
+
+
 echo "🔧 Composer install..."
 composer install --no-dev --optimize-autoloader
 
