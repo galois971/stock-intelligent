@@ -6,6 +6,468 @@
     </x-slot>
 
     <div class="py-8 px-4 sm:px-6 lg:px-8 bg-transparent min-h-screen">
+        <div class="max-w-7xl mx-auto space-y-8">
+            
+            <!-- === SECTION 1: KPIs Cards === -->
+            <section aria-labelledby="kpis-heading">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Total Produits -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-md hover:shadow-xl hover:border-emerald-500 transition-all duration-300 hover:-translate-y-1 group cursor-pointer">
+                        <div class="h-1 bg-gradient-to-r from-emerald-400 to-emerald-600"></div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Total Produits</p>
+                                    <p class="text-4xl font-bold text-gray-900 group-hover:text-emerald-600 transition">{{ $totalProducts ?? \App\Models\Product::count() }}</p>
+                                    <p class="text-xs text-gray-500 mt-3">Articles en stock</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-full p-4 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                                    <svg class="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Valeur du Stock -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-md hover:shadow-xl hover:border-teal-500 transition-all duration-300 hover:-translate-y-1 group cursor-pointer">
+                        <div class="h-1 bg-gradient-to-r from-teal-400 to-teal-600"></div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Valeur du Stock</p>
+                                    <p class="text-4xl font-bold text-gray-900 group-hover:text-teal-600 transition">{{ number_format($stockValue ?? 0, 2, ',', ' ') }} €</p>
+                                    <p class="text-xs text-gray-500 mt-3">Coût total</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-teal-50 to-teal-100 rounded-full p-4 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                                    <svg class="h-8 w-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertes Actives -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-md hover:shadow-xl hover:border-red-500 transition-all duration-300 hover:-translate-y-1 group cursor-pointer">
+                        <div class="h-1 bg-gradient-to-r from-red-400 to-red-600"></div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Alertes Actives</p>
+                                    <p class="text-4xl font-bold text-gray-900 group-hover:text-red-600 transition">{{ $activeAlerts ?? \App\Models\StockAlert::where('resolved', false)->count() }}</p>
+                                    <p class="text-xs text-gray-500 mt-3">À traiter</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-full p-4 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                                    <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mouvements Total -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-md hover:shadow-xl hover:border-purple-500 transition-all duration-300 hover:-translate-y-1 group cursor-pointer">
+                        <div class="h-1 bg-gradient-to-r from-purple-400 to-purple-600"></div>
+                        <div class="p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-3">Mouvements</p>
+                                    <p class="text-4xl font-bold text-gray-900 group-hover:text-purple-600 transition">{{ $totalMovements ?? \App\Models\StockMovement::count() }}</p>
+                                    <p class="text-xs text-gray-500 mt-3">Total des mouvements</p>
+                                </div>
+                                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-full p-4 group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                                    <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- === SECTION 2: Quick Access === -->
+            <section aria-labelledby="quick-access-heading">
+                <h3 id="quick-access-heading" class="text-lg font-semibold text-gray-900 mb-4">Accès rapide</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <a href="{{ route('products.index') }}" class="group bg-white rounded-lg border border-gray-200 p-4 hover:border-emerald-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                        <div class="bg-emerald-100 rounded-lg p-3 mb-3 group-hover:bg-emerald-200 transition w-fit">
+                            <svg class="h-6 w-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4v10l8 4 8-4V7z" /></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900">Produits</h4>
+                        <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">{{ $totalProducts ?? \App\Models\Product::count() }}</span>
+                    </a>
+
+                    <a href="{{ route('categories.index') }}" class="group bg-white rounded-lg border border-gray-200 p-4 hover:border-teal-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                        <div class="bg-teal-100 rounded-lg p-3 mb-3 group-hover:bg-teal-200 transition w-fit">
+                            <svg class="h-6 w-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21H3a2 2 0 01-2-2V9a2 2 0 012-2h4M12 3h7a2 2 0 012 2v12a2 2 0 01-2 2h-4" /></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900">Catégories</h4>
+                        <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">{{ $totalCategories ?? \App\Models\Category::count() }}</span>
+                    </a>
+
+                    <a href="{{ route('movements.index') }}" class="group bg-white rounded-lg border border-gray-200 p-4 hover:border-purple-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                        <div class="bg-purple-100 rounded-lg p-3 mb-3 group-hover:bg-purple-200 transition w-fit">
+                            <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4M7 16h10v4H7z" /></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900">Mouvements</h4>
+                        <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">{{ $totalMovements ?? \App\Models\StockMovement::count() }}</span>
+                    </a>
+
+                    <a href="{{ route('inventories.index') }}" class="group bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                        <div class="bg-blue-100 rounded-lg p-3 mb-3 group-hover:bg-blue-200 transition w-fit">
+                            <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900">Inventaires</h4>
+                        <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">{{ $totalInventories ?? \App\Models\Inventory::count() }}</span>
+                    </a>
+
+                    <a href="{{ route('alerts.index') }}" class="group bg-white rounded-lg border border-gray-200 p-4 hover:border-red-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                        <div class="bg-red-100 rounded-lg p-3 mb-3 group-hover:bg-red-200 transition w-fit">
+                            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900">Alertes</h4>
+                        @php $alertsCount = $activeAlerts ?? \App\Models\StockAlert::where('resolved', false)->count(); @endphp
+                        <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $alertsCount > 0 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700' }}">{{ $alertsCount }}</span>
+                    </a>
+
+                    <a href="{{ route('products.export.excel') }}" class="group bg-white rounded-lg border border-gray-200 p-4 hover:border-green-500 hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                        <div class="bg-green-100 rounded-lg p-3 mb-3 group-hover:bg-green-200 transition w-fit">
+                            <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        </div>
+                        <h4 class="text-sm font-bold text-gray-900">Exports</h4>
+                        <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">Export</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- === SECTION 3: Charts === -->
+            <section aria-labelledby="charts-heading" class="space-y-6">
+                <h3 id="charts-heading" class="text-lg font-semibold text-gray-900">Graphiques & Tendances</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Stock Evolution -->
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h4 class="text-base font-semibold text-gray-900">Évolution du Stock</h4>
+                            <p class="text-xs text-gray-500 mt-1">(30 derniers jours)</p>
+                        </div>
+                        <div class="p-6">
+                            <canvas id="stockEvolutionChart" height="300"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Movements by Type -->
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <div class="px-6 py-4 border-b border-gray-200">
+                            <h4 class="text-base font-semibold text-gray-900">Mouvements par Type</h4>
+                            <p class="text-xs text-gray-500 mt-1">(30 derniers jours)</p>
+                        </div>
+                        <div class="p-6">
+                            <canvas id="movementsByTypeChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Movements by Category (Full Width) -->
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <h4 class="text-base font-semibold text-gray-900">Mouvements par Catégorie</h4>
+                        <p class="text-xs text-gray-500 mt-1">(30 derniers jours)</p>
+                    </div>
+                    <div class="p-6">
+                        <canvas id="movementsByCategoryChart" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- === SECTION 4: Status Tables === -->
+            <section aria-labelledby="status-heading" class="space-y-6">
+                <h3 id="status-heading" class="text-lg font-semibold text-gray-900">État du Stock</h3>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Out of Stock -->
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-red-50">
+                            <h4 class="text-base font-semibold text-gray-900 flex items-center">
+                                <svg class="h-5 w-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                Produits en Rupture
+                            </h4>
+                        </div>
+                        <div class="p-6">
+                            @if(!empty($outOfStockProducts) && $outOfStockProducts->count() > 0)
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Produit</th>
+                                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Stock</th>
+                                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Min</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            @foreach($outOfStockProducts as $product)
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $product->name }}</td>
+                                                    <td class="px-4 py-3 text-sm text-center text-red-600 font-semibold">{{ $product->currentStock() }}</td>
+                                                    <td class="px-4 py-3 text-sm text-center text-gray-600">{{ $product->stock_min }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center py-8">
+                                    <svg class="h-12 w-12 text-emerald-500 mx-auto mb-3 opacity-50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                    <p class="text-sm text-gray-600 font-medium">✓ Aucun produit en rupture</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Low Stock -->
+                    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                        <div class="px-6 py-4 border-b border-gray-200 bg-amber-50">
+                            <h4 class="text-base font-semibold text-gray-900 flex items-center">
+                                <svg class="h-5 w-5 text-amber-600 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
+                                Stock Bas
+                            </h4>
+                        </div>
+                        <div class="p-6">
+                            @if(!empty($lowStockProducts) && $lowStockProducts->count() > 0)
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Produit</th>
+                                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Stock</th>
+                                                <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Min</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-200">
+                                            @foreach($lowStockProducts as $product)
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $product->name }}</td>
+                                                    <td class="px-4 py-3 text-sm text-center text-amber-600 font-semibold">{{ $product->currentStock() }}</td>
+                                                    <td class="px-4 py-3 text-sm text-center text-gray-600">{{ $product->stock_min }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center py-8">
+                                    <svg class="h-12 w-12 text-emerald-500 mx-auto mb-3 opacity-50" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
+                                    <p class="text-sm text-gray-600 font-medium">✓ Aucun produit avec stock bas</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- === SECTION 5: Recommendations & Forecasts === -->
+            @if(!empty($predictions) && count($predictions) > 0)
+            <section aria-labelledby="recommendations-heading">
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-emerald-50">
+                        <h4 id="recommendations-heading" class="text-base font-semibold text-gray-900 flex items-center">
+                            <svg class="h-5 w-5 text-emerald-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            Recommandations de Commande
+                        </h4>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Produit</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Stock Actuel</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Minimum</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">À Commander</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @foreach($predictions as $prediction)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ $prediction['product']->name }}</td>
+                                        <td class="px-4 py-3 text-sm text-center {{ $prediction['current_stock'] < $prediction['stock_min'] ? 'text-red-600 font-semibold' : 'text-gray-600' }}">{{ $prediction['current_stock'] }}</td>
+                                        <td class="px-4 py-3 text-sm text-center text-gray-600">{{ $prediction['stock_min'] }}</td>
+                                        <td class="px-4 py-3 text-sm text-center text-emerald-600 font-semibold">{{ $prediction['suggested_order'] }} unités</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            @endif
+
+            <!-- === SECTION 6: Recent Forecasts === -->
+            @if(!empty($latestForecasts) && $latestForecasts->count() > 0)
+            <section aria-labelledby="forecasts-heading">
+                <div class="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-blue-50">
+                        <h4 id="forecasts-heading" class="text-base font-semibold text-gray-900">Prévisions Récentes</h4>
+                        <p class="text-xs text-gray-500 mt-1">Dernières prévisions calculées</p>
+                    </div>
+                    <div class="p-6 overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Produit</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Méthode</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">Historique</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">RMSE</th>
+                                    <th class="px-4 py-3 text-center text-xs font-semibold text-gray-700 uppercase">MAPE</th>
+                                    <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                @foreach($latestForecasts->take(5) as $f)
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-4 py-3 whitespace-nowrap font-medium text-gray-900">{{ $f->product?->name ?? '—' }}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-gray-600">{{ $f->method }}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-center text-gray-600">{{ $f->history_days }} j</td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-center text-gray-600">{{ $f->rmse !== null ? number_format($f->rmse, 2) : '—' }}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-center {{ $f->mape !== null && $f->mape < 20 ? 'text-emerald-600 font-semibold' : 'text-gray-600' }}">{{ $f->mape !== null ? number_format($f->mape, 1) . '%' : '—' }}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-right text-gray-600">{{ $f->created_at->format('d/m H:i') }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            @endif
+
+        </div>
+    </div>
+
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                initCharts();
+            }, 500);
+        });
+
+        function initCharts() {
+            // Évolution du Stock
+            try {
+                const stockEvolutionCtx = document.getElementById('stockEvolutionChart');
+                if (stockEvolutionCtx) {
+                    new Chart(stockEvolutionCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['01/01', '05/01', '10/01', '15/01', '20/01', '25/01', '30/01', '04/02', '08/02', '10/02'],
+                            datasets: [{
+                                label: 'Stock Total',
+                                data: [120, 140, 135, 160, 155, 180, 175, 190, 185, 200],
+                                borderColor: 'rgb(16, 185, 129)',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: true }
+                            },
+                            scales: {
+                                y: { beginAtZero: true },
+                                x: {}
+                            }
+                        }
+                    });
+                }
+            } catch(e) { console.error('Stock chart error:', e); }
+
+            // Mouvements par Type
+            try {
+                const movementsByTypeCtx = document.getElementById('movementsByTypeChart');
+                if (movementsByTypeCtx) {
+                    new Chart(movementsByTypeCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Entrées', 'Sorties'],
+                            datasets: [{
+                                data: [450, 320],
+                                backgroundColor: [
+                                    'rgba(34, 197, 94, 0.8)',
+                                    'rgba(239, 68, 68, 0.8)'
+                                ],
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+            } catch(e) { console.error('Movements chart error:', e); }
+
+            // Mouvements par Catégorie
+            try {
+                const movementsByCategoryCtx = document.getElementById('movementsByCategoryChart');
+                if (movementsByCategoryCtx) {
+                    new Chart(movementsByCategoryCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Électronique', 'Bureautique', 'Pièces détachées', 'Accessoires'],
+                            datasets: [{
+                                label: 'Sorties (unités)',
+                                data: [120, 95, 60, 45],
+                                backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: { beginAtZero: true }
+                            }
+                        }
+                    });
+                }
+            } catch(e) { console.error('Category chart error:', e); }
+        }
+    </script>
+    <script>
+        (function(){
+            const url = "{{ route('dashboard.counts') }}";
+            const ids = {
+                products: 'badge-products',
+                categories: 'badge-categories',
+                movements: 'badge-movements',
+                inventories: 'badge-inventories',
+                alerts: 'badge-alerts',
+                exports: 'badge-exports'
+            };
+
+            async function updateCounts(){
+                try{
+                    const res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+                    if(!res.ok) return;
+                    const data = await res.json();
+                    const setText = (id, value) => { const el = document.getElementById(id); if(el) el.innerText = value; };
+                    setText(ids.products, data.products);
+                    setText(ids.categories, data.categories);
+                    setText(ids.movements, data.movements);
+                    setText(ids.inventories, data.inventories);
+                    setText(ids.exports, data.products);
+
+                    const alertsEl = document.getElementById(ids.alerts);
+                    if(alertsEl){
+                        alertsEl.innerText = data.alerts;
+                    }
+                }catch(e){ console.debug('updateCounts error', e); }
+            }
+
+            updateCounts();
+            setInterval(updateCounts, 30000);
+        })();
+    </script>
+    @endpush
+</x-app-layout>
         <div class="max-w-7xl mx-auto">
             <!-- KPIs Cards - CoreUI Style -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

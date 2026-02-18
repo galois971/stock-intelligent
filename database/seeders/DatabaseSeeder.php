@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -14,6 +16,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Nettoyer les tables pivot
+        DB::table('model_has_roles')->truncate();
+        DB::table('model_has_permissions')->truncate();
+
+        // Nettoyer les rôles et permissions pour éviter les doublons
+        Role::truncate();
+        Permission::truncate();
+
         // Permissions
         $permissions = [
             'manage products',
@@ -27,14 +37,17 @@ class DatabaseSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // Rôles selon le cahier des charges :
-        // - Admin : accès complet (tous les modules)
-        // - Gestionnaire : gère produits, catégories, inventaires, mouvements
-        // - Observateur : lecture seule (consulte les alertes)
+        // Rôles selon le cahier des charges
         $roles = [
-            'admin' => ['manage products', 'manage categories', 'manage inventories', 'manage stock movements', 'view alerts'],
-            'gestionnaire' => ['manage products', 'manage categories', 'manage inventories', 'manage stock movements', 'view alerts'],
-            'observateur' => ['view alerts'],
+            'admin' => $permissions, // accès complet
+            'gestionnaire' => [
+                'manage products',
+                'manage categories',
+                'manage inventories',
+                'manage stock movements',
+                'view alerts',
+            ],
+            'observateur' => ['view alerts'], // lecture seule
         ];
 
         foreach ($roles as $roleName => $rolePermissions) {
@@ -47,7 +60,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@example.com'],
             [
                 'name' => 'Admin User',
-                'password' => bcrypt('password'), // mot de passe par défaut
+                'password' => Hash::make('password'), // mot de passe par défaut
                 'email_verified_at' => now(),
             ]
         );
@@ -58,7 +71,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'gestionnaire@example.com'],
             [
                 'name' => 'Gestionnaire User',
-                'password' => bcrypt('password'),
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
@@ -69,13 +82,13 @@ class DatabaseSeeder extends Seeder
             ['email' => 'observateur@example.com'],
             [
                 'name' => 'Observateur User',
-                'password' => bcrypt('password'),
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
             ]
         );
         $observer->assignRole('observateur');
 
-        // Call resource seeders
+        // Appeler les autres seeders de ressources
         $this->call([
             CategorySeeder::class,
             ProductSeeder::class,

@@ -32,15 +32,35 @@
                         <div class="w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
                             <span class="text-white font-bold text-sm">{{ substr(Auth::user()->name, 0, 1) }}</span>
                         </div>
-                        <span class="text-sm font-medium text-gray-900">{{ Auth::user()->name }}</span>
+                        <div class="flex flex-col items-start">
+                            <span class="text-sm font-medium text-gray-900">{{ Auth::user()->name }}</span>
+                            @php
+                                $role = Auth::user()->getRoleNames()->first() ?? 'Utilisateur';
+                                $roleColor = match($role) {
+                                    'admin' => 'bg-red-100 text-red-700',
+                                    'gestionnaire' => 'bg-blue-100 text-blue-700',
+                                    'observateur' => 'bg-gray-100 text-gray-700',
+                                    default => 'bg-gray-100 text-gray-700'
+                                };
+                            @endphp
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded {{ $roleColor }}">
+                                {{ ucfirst($role) }}
+                            </span>
+                        </div>
                         <svg class="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
                     </button>
                     <div class="absolute right-0 mt-0 w-48 bg-white text-gray-800 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 border border-gray-200">
-                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 hover:bg-gray-50 first:rounded-t-lg transition">
-                            <div class="font-medium text-gray-900">Mon Profil</div>
-                            <div class="text-xs text-gray-600">{{ Auth::user()->email }}</div>
+                        <div class="px-4 py-3 border-b border-gray-200 bg-gradient-to-r from-emerald-50 to-emerald-100">
+                            <div class="font-bold text-gray-900">Bienvenue, {{ Auth::user()->name }}!</div>
+                            <div class="text-xs text-gray-600 mt-1">{{ Auth::user()->email }}</div>
+                            <div class="text-xs font-semibold px-2 py-1 rounded mt-2 {{ $roleColor }} inline-block">
+                                {{ ucfirst($role) }}
+                            </div>
+                        </div>
+                        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 hover:bg-gray-50 transition text-gray-700">
+                            <div class="font-medium text-sm">👤 Mon Profil</div>
                         </a>
                         <form method="POST" action="{{ route('logout') }}" class="border-t border-gray-200">
                             @csrf

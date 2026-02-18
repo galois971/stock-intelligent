@@ -242,3 +242,18 @@ Route::prefix('api/v1')->group(function () {
 Route::get('/debug', function () {
     return 'Auth fonctionne';
 });
+Route::get('/admin/dashboard', function () {
+    return view('dashboard.admin');
+})->name('admin.dashboard');
+
+Route::get('/manager/dashboard', function () {
+    return view('dashboard.manager');
+})->name('manager.dashboard');
+
+Route::get('/observer/dashboard', function () {
+    return view('dashboard.observer');
+})->name('observer.dashboard');
+
+Route::get('/home', function () {
+    return view('welcome');
+})->name('home');

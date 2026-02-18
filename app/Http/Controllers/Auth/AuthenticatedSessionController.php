@@ -28,7 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirection selon le rôle de l'utilisateur
+        $user = Auth::user();
+
+        if ($user->hasRole('admin')) {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user->hasRole('gestionnaire')) {
+            return redirect()->route('manager.dashboard');
+        } elseif ($user->hasRole('observateur')) {
+            return redirect()->route('observer.dashboard');
+        }
+
+        // Par défaut si aucun rôle
+        return redirect()->route('home');
     }
 
     /**
@@ -39,7 +51,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

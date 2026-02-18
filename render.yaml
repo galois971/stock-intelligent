@@ -3,8 +3,7 @@ services:
     name: stock-intelligent
     runtime: php
     buildCommand: chmod +x build.sh && ./build.sh
-    startCommand: |
-      php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
+    startCommand: php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
     envVars:
       - key: APP_ENV
         value: production
