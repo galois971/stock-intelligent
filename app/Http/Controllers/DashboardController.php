@@ -13,9 +13,27 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    /**
-     * Affiche le tableau de bord avec toutes les statistiques
-     */
+    public function index()
+    {
+        return view('dashboard.index'); // vue commune ou accueil
+    }
+
+    public function admin()
+    {
+        return view('dashboard.admin'); // vue spécifique admin
+    }
+
+    public function manager()
+    {
+        return view('dashboard.manager'); // vue spécifique gestionnaire
+    }
+
+    public function observer()
+    {
+        return view('dashboard.observer'); // vue spécifique observateur
+    }
+}
+
     public function index()
     {
         // KPIs principaux

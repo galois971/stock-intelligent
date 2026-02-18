@@ -52,6 +52,12 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+	Route::get('/home', [DashboardController::class, 'index'])->name('home');
+
+    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
+    Route::get('/manager/dashboard', [DashboardController::class, 'manager'])->name('manager.dashboard');
+    Route::get('/observer/dashboard', [DashboardController::class, 'observer'])->name('observer.dashboard');
+
 	Route::get('verify-email', [EmailVerificationPromptController::class, '__invoke'])
 		->name('verification.notice');
 

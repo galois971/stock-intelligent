@@ -123,6 +123,17 @@
                 ])>
                     🚨 Alertes
                 </a>
+            @auth
+        {{-- Liens spécifiques selon le rôle --}}
+        @if(Auth::user()->hasRole('admin'))
+            <a href="{{ route('dashboard') }}">🛠️ Admin</a>
+        @elseif(Auth::user()->hasRole('gestionnaire'))
+            <a href="{{ route('manager.dashboard') }}">📂 Gestionnaire</a>
+        @elseif(Auth::user()->hasRole('observateur'))
+            <a href="{{ route('observer.dashboard') }}">👀 Observateur</a>
+        @endif
+    @endauth
+
             </nav>
         </div>
     </div>
@@ -176,6 +187,35 @@
             <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm font-medium transition">
                 👤 Mon Profil
             </a>
+            @auth
+            @if(Auth::user()->hasRole('admin'))
+                <a href="{{ route('dashboard') }}" class="block px-4 py-2 rounded-md text-sm font-medium transition text-gray-700 hover:bg-gray-200">
+                    🛠️ Admin
+                </a>
+            @elseif(Auth::user()->hasRole('gestionnaire'))
+                <a href="{{ route('manager.dashboard') }}" class="block px-4 py-2 rounded-md text-sm font-medium transition text-gray-700 hover:bg-gray-200">
+                    📂 Gestionnaire
+                </a>
+            @elseif(Auth::user()->hasRole('observateur'))
+                <a href="{{ route('observer.dashboard') }}" class="block px-4 py-2 rounded-md text-sm font-medium transition text-gray-700 hover:bg-gray-200">
+                    👀 Observateur
+                </a>
+            @endif
+        @endauth
+
+        <hr class="border-gray-300 my-2">
+        <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm font-medium transition">
+            👤 Mon Profil
+        </a>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm font-medium transition">
+                🚪 Déconnexion
+            </button>
+        </form>
+    </div>
+</div>
+<!-- Mobile User Menu -->
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-200 rounded-md text-sm font-medium transition">
