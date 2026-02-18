@@ -4,7 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ config('app.name', 'Stock Manager') }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @php
+        $manifestPath = public_path('build/manifest.json');
+    @endphp
+
+    @if (file_exists($manifestPath))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        @php
+            $manifest = json_decode(@file_get_contents($manifestPath), true) ?: null;
+        @endphp
+        @if (is_array($manifest) && isset($manifest['resources/css/app.css']['file']))
+            <link rel="stylesheet" href="{{ asset('build/' . $manifest['resources/css/app.css']['file']) }}">
+        @else
+            {{-- Fallback statique si manifest manquant ou corrompu --}}
+            <link rel="stylesheet" href="{{ asset('build/assets/app-DPg4-Vjw.css') }}">
+        @endif
+        @if (is_array($manifest) && isset($manifest['resources/js/app.js']['file']))
+            <script src="{{ asset('build/' . $manifest['resources/js/app.js']['file']) }}" defer></script>
+        @else
+            <script src="{{ asset('build/assets/app-CKl8NZMC.js') }}" defer></script>
+        @endif
+    @endif
 </head>
 <body class="bg-gradient-to-br from-white via-gray-50 to-gray-100 text-gray-900">
 
